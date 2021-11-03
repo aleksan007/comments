@@ -1,0 +1,37 @@
+main > .container {
+    padding: 70px 15px 20px;
+}
+
+
+
+
+@media(max-width:767px) {
+    .nav li > form > button.logout {
+        display:block;
+        text-align: left;
+        width: 100%;
+        padding: 10px 0;
+    }
+}
+
+comment {
+    margin: 0;
+    background: white;
+    border-top: 5px solid #EAF9F9;
+    border-bottom: 5px solid #EAF9F9;
+    color: #3A3C55;
+    padding: 30px 30px 30px 90px;
+    position: relative;
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+}
+
+comment p {
+    margin: 0 0 16px;
+    font-size: 18px;
+    letter-spacing: .05em;
+    line-height: 1.4;
+}
+comment date {
+    font-style: normal;
+}
