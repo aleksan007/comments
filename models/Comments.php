@@ -23,15 +23,21 @@ class Comments extends \yii\db\ActiveRecord
         return [
             [['text', 'user'], 'required'],
             [['user'], 'string', 'max' => 100],
-            [['text'], 'text'],
+            [['text'], 'string'],
             [['date'], 'safe'],
             [['parent_id'], 'integer'],
 
         ];
     }
 
+    public function attributeLabels()
+    {
+        return ['text'=>'Новое сообщение'];
+    }
+
     public static function getAll() {
-        return self::find()->all();
+        $all = self::find()->all();
+        return self::groupComments($all);
     }
 
     public static function groupComments($comments) {
@@ -40,54 +46,57 @@ class Comments extends \yii\db\ActiveRecord
             $comments_arr[$comment->id] = $comment;
         }
         $res = [];
-        foreach($comments as $comment) {
+        foreach($comments_arr as $comment) {
             if ($comment->id == $comment->parent_id) $comment->parent_id = 0;
-            $res[$comment->parent_id][] = [$comment->id, $comment->text];
+            $res[$comment->parent_id][] = $comment;
         }
         return $res;
     }
 
-    public static function getTrees($comments) {
-        self::makeTree($comments);
-    }
-
-    /*public function getDate() {
+    public function getDate() {
         return date('d.m.Y H:i',strtotime($this->date));
     }
 
     public function getAuthor() {
         return $this->user;
     }
-    public function getChild() {
-        return self::find()->where(['parent_id'=>$this->id])->all();
-    }
 
-    public function write() {
-        $str = "";
-        $str .= "<div class='itemComment'>";
-        $str .= "<p>{$this->text}</p>";
-        $str .= "<author>{$this->getAuthor()}</author>";
-        $str .= "<date>{$this->getDate()}</date>";
-        $str .= "<reply>Ответить</reply>";
-        $str .= "<reply>Удалить</reply>";
+    public static function makeTrees($comments, $root = 0) {
+        if(!$comments) return false;
 
-        if ($this->getChild()) {
-        }
+        foreach($comments[$root] as $comment) {
+            echo "<div class='comment'>";
+            echo "<text>{$comment->text}</text>";
+            echo "<author>{$comment->getAuthor()}</author> ";
+            echo "<date>{$comment->getDate()}</date> ";
 
-        $str .= "</div>";
+            if($comment->canDelete())  echo "<delete attr_id_comment={$comment->id}>Удалить</delete> ";
+            if($comment->canUpdate())  echo "<change attr_id_comment={$comment->id}>Изменить</change> ";
+            echo "<reply attr_id_comment={$comment->id}>Ответить</reply> ";
 
-        return $str;
-    }*/
-
-    protected static function makeTree($comment, $root = 0) {
-        foreach($comment[$root] as $i) {
-            echo "<div class='itemComment'>";
-            echo "<p>{$i[1]}</p>";
-            echo "<date>21.01.2021 17:05</date>";
-            if (isset($comment[$i[0]])) self::makeTree($comment, $i[0]);
+            if (isset($comments[$comment->id])) self::makeTrees($comments, $comment->id);
             echo "</div>";
         }
+    }
 
+    public function reply($text) {
+        $new = new Comments();
+        $new->text = $text;
+        $new->user = 'reply_user_1';
+        $new->parent_id = $this->id;
+       return $new->save();
+    }
+
+    protected function getHourDiff() {
+        return abs(round((strtotime(date($this->date)) - strtotime(date('YmdHis')))/3600, 1));
+    }
+
+    public function canDelete($hour = 1) {
+        return ($this->getHourDiff() >= $hour ? false : true);
+    }
+
+    public function canUpdate($hour = 1) {
+        return ($this->getHourDiff() >= $hour ? false : true);
     }
 
 }
