@@ -10,6 +10,7 @@ $(document).on('click', 'reply', function () {
     modal.attr('action','comment/reply');
     modal.find('#comment_input').attr('id_comment',id_comment);
     modal.find('#comment_input').val('');
+    modal.find('.modal-header').html('Ответить');
     modal.modal('show');
 });
 
@@ -19,10 +20,11 @@ $(document).on('click', 'change', function () {
     var text = $(this).parent('.comment').find('text').html();
     var modal =  $('#modal');
 
-    modal.modal('show');
     modal.attr('action','comment/update');
     modal.find('#comment_input').attr('id_comment',id_comment);
     modal.find('#comment_input').val(text);
+    modal.find('.modal-header').html('Изменить');
+    modal.modal('show');
 });
 
 $(document).on('click', 'delete', function () {
@@ -54,7 +56,7 @@ $(document).on('click', '#saveComment', function () {
             success: function(msg){
                  if(msg.status == 'ok')
                  {
-                     $.pjax.reload({container:"#all_comments",timeout: false});
+                     $.pjax.reload({container:"#all_comments"});
                      $('#modal').modal('hide');
                  } else {
                      $('#modal').find('#status_messages').html(msg.message);

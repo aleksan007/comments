@@ -62,8 +62,12 @@ class Comments extends \yii\db\ActiveRecord
     }
 
     public static function makeTrees($comments, $root = 0) {
+        if($root !== 0) {
+           // print_r(count($comments));
+            //print_r($root);
+        }
+        print_r($root);
         if(!$comments) return false;
-
         foreach($comments[$root] as $comment) {
             echo "<div class='comment'>";
             echo "<text>{$comment->text}</text>";
@@ -74,15 +78,19 @@ class Comments extends \yii\db\ActiveRecord
             if($comment->canUpdate())  echo "<change attr_id_comment={$comment->id}>Изменить</change> ";
             echo "<reply attr_id_comment={$comment->id}>Ответить</reply> ";
 
-            if (isset($comments[$comment->id])) self::makeTrees($comments, $comment->id);
+
+            if (isset($comments[$comment->id])) {
+                self::makeTrees($comments, $comment->id);
+            }
             echo "</div>";
+
         }
     }
 
     public function reply($text) {
         $new = new Comments();
         $new->text = $text;
-        $new->user = 'reply_user_1';
+        $new->user = Yii::$app->session->get('username');
         $new->parent_id = $this->id;
        return $new->save();
     }
@@ -92,11 +100,11 @@ class Comments extends \yii\db\ActiveRecord
     }
 
     public function canDelete($hour = 1) {
-        return ($this->getHourDiff() >= $hour ? false : true);
+        return ($this->getHourDiff() >= $hour ? false : true) && Yii::$app->session->get('username') == $this->user;
     }
 
     public function canUpdate($hour = 1) {
-        return ($this->getHourDiff() >= $hour ? false : true);
+        return ($this->getHourDiff() >= $hour ? false : true) && Yii::$app->session->get('username') == $this->user;
     }
 
 }

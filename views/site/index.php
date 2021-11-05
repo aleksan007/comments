@@ -8,29 +8,54 @@ use yii\widgets\Pjax;
 
 $this->title = 'Тестовое Gajin';
 
+
 ?>
 
+<?php Pjax::begin(['id' => 'header_block']); ?>
+<?php
+$login_user = Yii::$app->session->get('username');
 
-<div class="row">
-    <div class="col-md-6">
 
+?>
+    <div class="row">
+        <div class="col-md-6" id="login_div">
+            <p><?php echo ($login_user) ? "Залогинен: {$login_user}" : "Никто не залогинен"?></p>
+        </div>
     </div>
-</div>
 
+
+    <div class="row" id="login-block">
+        <div class="col-md-6">
+            <form id="login_form">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Логин пользователя" aria-describedby="button-addon2" id="input_username" required>
+                    <button class="btn btn-secondary" type="submit" id="button-addon2">Залогиниться</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <?php
+    $login_user = Yii::$app->session->get('username');
+    if($login_user) { ?>
+        <div class="row">
+            <div class="col-md-6">
+                <?php
+                $new = new Comments();
+                $form = ActiveForm::begin(['id'=>'new_message_form']);
+                echo $form->field($new, 'text')->textInput(['maxlength' => true]);
+                echo Html::submitButton('Отправить', ['class' => 'btn btn-success']);
+                ActiveForm::end();
+                ?>
+            </div>
+        </div>
+    <?php } ?>
+<?php Pjax::end(); ?>
 
 
 <div class="site-index">
     <div class="body-content">
-
-        <div class="row">
-            <div class="col-md-12">
-                <?php $form = ActiveForm::begin(['id'=>'new_message_form']); ?>
-                    <?= $form->field($new, 'text')->textInput(['maxlength' => true])  ?>
-                    <?= Html::submitButton('Отправить', ['class' => 'btn btn-success']); ?>
-                <?php ActiveForm::end(); ?>
-            </div>
-        </div>
-
         <?php Pjax::begin(['id' => 'all_comments']); ?>
             <div class="row">
                 <div class="col-md-12">
@@ -39,32 +64,22 @@ $this->title = 'Тестовое Gajin';
                     $trees = Comments::makeTrees($comments);
                     ?>
                 </div>
-
             </div>
         <?php Pjax::end(); ?>
-
-        <div class="row">
-            <?php
-            Modal::begin([
-                'id' => 'modal',
-                'size' => 'modal-lg',
-            ]); ?>
-
-            <div id='modalContent'>
-                <input type="text" id="comment_input" class="form-control">
-                <button class="btn btn-success" id="saveComment">Сохранить</button>
-                <div id="status_messages"></div>
-            </div>
-
-            <?php  Modal::end();
-            ?>
-        </div>
     </div>
 </div>
 
 
 <?php
+Modal::begin([
+    'id' => 'modal',
+    'size' => 'modal-lg',
+]); ?>
 
+    <textarea id="comment_input" class="form-control"></textarea><br>
+    <button class="btn btn-success" id="saveComment">Отправить</button>
 
+    <div id="status_messages"></div>
 
+<?php  Modal::end();
 ?>

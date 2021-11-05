@@ -60,3 +60,11 @@ main > .container {
     background: rgba(255, 3, 0, 0.66);
     transition: .55s;
 }
+
+#login_div {
+    padding-top: 15px;
+}
+
+#login-block {
+    padding-bottom: 20px;
+}
