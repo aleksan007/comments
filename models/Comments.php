@@ -62,33 +62,30 @@ class Comments extends \yii\db\ActiveRecord
     }
 
     public static function makeTrees($comments, $root = 0) {
-        if($root !== 0) {
-           // print_r(count($comments));
-            //print_r($root);
-        }
-        print_r($root);
         if(!$comments) return false;
         foreach($comments[$root] as $comment) {
-            echo "<div class='comment'>";
-            echo "<text>{$comment->text}</text>";
-            echo "<author>{$comment->getAuthor()}</author> ";
-            echo "<date>{$comment->getDate()}</date> ";
-
-            if($comment->canDelete())  echo "<delete attr_id_comment={$comment->id}>Удалить</delete> ";
-            if($comment->canUpdate())  echo "<change attr_id_comment={$comment->id}>Изменить</change> ";
-            echo "<reply attr_id_comment={$comment->id}>Ответить</reply> ";
-
-
-            if (isset($comments[$comment->id])) {
-                self::makeTrees($comments, $comment->id);
-            }
-            echo "</div>";
-
+            self::writeComment($comments, $comment);
         }
     }
 
+    protected static function writeComment($comments, $comment) {
+        echo "<div class='comment'>";
+        echo "<text>{$comment->text}</text>";
+        echo "<author>{$comment->getAuthor()}</author> ";
+        echo "<date>{$comment->getDate()}</date> ";
+
+        if($comment->canDelete())  echo "<delete attr_id_comment={$comment->id}>Удалить</delete>";
+        if($comment->canUpdate())  echo "<change attr_id_comment={$comment->id}>Изменить</change>";
+        if($comment->canReply())  echo  "<reply attr_id_comment={$comment->id}>Ответить</reply>";
+
+        if (isset($comments[$comment->id])) {
+            self::makeTrees($comments, $comment->id);
+        }
+        echo "</div>";
+    }
+
     public function reply($text) {
-        $new = new Comments();
+        $new = new self();
         $new->text = $text;
         $new->user = Yii::$app->session->get('username');
         $new->parent_id = $this->id;
@@ -100,11 +97,29 @@ class Comments extends \yii\db\ActiveRecord
     }
 
     public function canDelete($hour = 1) {
-        return ($this->getHourDiff() >= $hour ? false : true) && Yii::$app->session->get('username') == $this->user;
+        return ($this->getHourDiff() >= $hour ? false : true) && $this->isAuthor();
     }
 
     public function canUpdate($hour = 1) {
-        return ($this->getHourDiff() >= $hour ? false : true) && Yii::$app->session->get('username') == $this->user;
+        return ($this->getHourDiff() >= $hour ? false : true) && $this->isAuthor();
     }
+
+    public function canReply() {
+        return (Yii::$app->session->get('username')) ? true : false;
+    }
+
+    protected function isAuthor() {
+        return Yii::$app->session->get('username') == $this->user;
+    }
+
+    public function updateChildrens() {
+        $childrens = Comments::find()->where(['parent_id'=>$this->id])->all();
+        foreach ($childrens as $children) {
+            $children->parent_id = $this->parent_id;
+            $children->save();
+        }
+    }
+
+
 
 }

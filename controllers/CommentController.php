@@ -17,9 +17,9 @@ class CommentController extends Controller
         $data = Yii::$app->request->post();
 
         if($data) {
-            $find = Comments::findOne($data['id_comment']);
-            if($find) {
-                $reply = $find->reply($data['text']);
+            $comment = Comments::findOne($data['id_comment']);
+            if($comment && $comment->canReply()) {
+                $reply = $comment->reply($data['text']);
                 if($reply) {
                     return Response::success('Комментарий добавлен');
                 }
@@ -34,10 +34,10 @@ class CommentController extends Controller
         $data = Yii::$app->request->post();
 
         if($data) {
-            $find = Comments::findOne($data['id_comment']);
-            if($find && $find->canUpdate()) {
-                $find->text = $data['text'];
-                if($find->update()) {
+            $comment = Comments::findOne($data['id_comment']);
+            if($comment && $comment->canUpdate()) {
+                $comment->text = $data['text'];
+                if($comment->update()) {
                     return Response::success('Комментарий изменен');
                 }
             }
@@ -66,15 +66,9 @@ class CommentController extends Controller
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $data = Yii::$app->request->post();
         if($data) {
-            $find = Comments::findOne($data['id_comment']);
-
-            if($find->canDelete() && $find->delete()) {
-                $childrens = Comments::find()->where(['parent_id'=>$find->id])->all();
-                foreach ($childrens as $children) {
-                    $children->parent_id = $find->parent_id;
-                    $children->save();
-                }
-
+            $comment = Comments::findOne($data['id_comment']);
+            if($comment->canDelete() && $comment->delete()) {
+                $comment->updateChildrens();
                 return Response::success('Комментарий удален');
             }
         }
