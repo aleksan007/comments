@@ -9,17 +9,19 @@ services:
       - ./:/app:delegated
     ports:
       - '8000:80'
+    depends_on:
+      - db
 
   db:
     image: mysql
     container_name: gajin_mysql
     restart: always
     ports:
-      - '3310:3306'
+      - '3311:3306'
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: gajin
       MYSQL_USER: root1
       MYSQL_PASSWORD: root1
     volumes:
-      - ./db_data:/var/lib/mysql
+      - ./db_data4:/var/lib/mysql
