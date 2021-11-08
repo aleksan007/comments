@@ -21,12 +21,12 @@
 1. Нужно скачать этот репозиторий
 2. Разархивировать
 3. Перейти в папку с проектом
-4. В консоли выполнить "docker-compose up --build"
+4. В консоли выполнить "docker-compose up --build" <br>
 Предварительно должен быть скачен docker и docker-compose
-5. Нужно установить композер, он скачать папку Vendor, выполнить в консоли:
+5. Устанавливаем композер:
 "docker-compose exec php composer install"
-5. Нужно накатить миграции для создания таблицы, для этого выполнить в консоли:
-"docker-compose exec php php yii migrate"
+5. Накатываем миграцию:
+docker-compose exec php php yii migrate"
 Если ругается на занятый порт, поменять порт в файле docker-compose.yml
 6. Можно переходить в браузере на localhost:8000 и тестировать
 
