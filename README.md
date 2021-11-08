@@ -1,4 +1,6 @@
-Тестовое задание для Gajin
+Тестовое задание для Gaijin
+
+<http://88.212.253.234:8000/>
 
 
 ### Описание
@@ -18,15 +20,22 @@
 
 
 ### Тестирование
-1. Нужно скачать этот репозиторий
-2. Разархивировать
-3. Перейти в папку с проектом
-4. В консоли выполнить "docker-compose up --build" <br>
-Предварительно должен быть скачен docker и docker-compose
-5. Устанавливаем композер:<br>
-"docker-compose exec php composer install"
-5. Накатываем миграцию:<br>
-"docker-compose exec php php yii migrate"
-Если ругается на занятый порт, поменять порт в файле docker-compose.yml
-6. Можно переходить в браузере на localhost:8000 и тестировать
+- Нужно скачать этот репозиторий
+ ```console
+ git clone https://github.com/aleksan007/comments.git
+ ```
+- Перейти в папку с проектом
+- Поднимаем контейнеры. Предварительно должен быть скачен docker и docker-compose
+ ```console
+ docker-compose up --build
+ ```
+- Устанавливаем композер:
+ ```console
+ docker-compose exec web composer install
+ ```
+- Накатываем миграцию:
+ ```console
+ docker-compose exec web yii migrate
+ ```
+- Можно переходить в браузере на <localhost:8000> и тестировать
 
