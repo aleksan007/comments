@@ -23,10 +23,10 @@
 3. Перейти в папку с проектом
 4. В консоли выполнить "docker-compose up --build" <br>
 Предварительно должен быть скачен docker и docker-compose
-5. Устанавливаем композер:
+5. Устанавливаем композер:<br>
 "docker-compose exec php composer install"
-5. Накатываем миграцию:
-docker-compose exec php php yii migrate"
+5. Накатываем миграцию:<br>
+"docker-compose exec php php yii migrate"
 Если ругается на занятый порт, поменять порт в файле docker-compose.yml
 6. Можно переходить в браузере на localhost:8000 и тестировать
 
