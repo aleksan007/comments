@@ -1,9 +1,9 @@
 version: '2'
 services:
-  php:
-    build: docker/php
-    #image: yiisoftware/yii2-php:7.4-apache
-    container_name: gajin
+  web:
+    #build: docker/php
+    image: yiisoftware/yii2-php:7.4-apache
+    container_name: gaijin
     volumes:
       - ./:/app:delegated
     ports:
@@ -13,14 +13,14 @@ services:
 
   db:
     image: mysql
-    container_name: gajin_mysql
+    container_name: gaijin_mysql
     restart: always
     ports:
-      - '3311:3306'
+      - '3307:3306'
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: gajin
       MYSQL_USER: root1
       MYSQL_PASSWORD: root1
     volumes:
-      - ./db_data4:/var/lib/mysql
+      - ./db_data:/var/lib/mysql
