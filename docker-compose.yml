@@ -19,7 +19,7 @@ services:
       - '3307:3306'
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: gajin
+      MYSQL_DATABASE: gaijin
       MYSQL_USER: root1
       MYSQL_PASSWORD: root1
     volumes:
