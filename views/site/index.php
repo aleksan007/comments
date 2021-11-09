@@ -26,12 +26,14 @@ $login_user = Yii::$app->session->get('username');
 
     <div class="row" id="login-block">
         <div class="col-md-6">
-            <form id="login_form">
-                <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Логин пользователя" aria-describedby="button-addon2" id="input_username" required>
-                    <button class="btn btn-secondary" type="submit" id="button-addon2">Залогиниться</button>
-                </div>
-            </form>
+            <?php
+            $new = new \app\models\Login();
+            $form = ActiveForm::begin(['id'=>'login_form']);
+            echo $form->field($new, 'user')->textInput();
+            echo Html::submitButton('Залогиниться', ['class' => 'btn btn-success']);
+            ActiveForm::end();
+            ?>
+
         </div>
     </div>
 

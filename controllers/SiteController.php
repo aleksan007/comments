@@ -16,7 +16,9 @@ class SiteController extends Controller
 
     public function actionLogin() {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        Yii::$app->session->set('username',Yii::$app->request->post('username'));
+        $post = Yii::$app->request->post('Login');
+        $username = $post['user'];
+        Yii::$app->session->set('username',$username);
         return Response::success(Yii::$app->session->get('username'));
     }
 }
