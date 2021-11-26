@@ -1,8 +1,3 @@
-
-$(document).ready(function() {
-
-});
-
 $(document).on('click', 'reply', function () {
     var id_comment = $(this).attr('attr_id_comment');
     var modal =  $('#modal');
@@ -11,6 +6,7 @@ $(document).on('click', 'reply', function () {
     modal.find('#comment_input').attr('id_comment',id_comment);
     modal.find('#comment_input').val('');
     modal.find('.modal-header').html('Ответить');
+    modal.find('#status_messages').html('');
     modal.modal('show');
 });
 
@@ -24,6 +20,7 @@ $(document).on('click', 'change', function () {
     modal.find('#comment_input').attr('id_comment',id_comment);
     modal.find('#comment_input').val(text);
     modal.find('.modal-header').html('Изменить');
+    modal.find('#status_messages').html('');
     modal.modal('show');
 });
 
@@ -47,7 +44,7 @@ $(document).on('click', '#saveComment', function () {
     var text = $('#comment_input').val();
     var id_comment = $('#comment_input').attr('id_comment');
     var action =  $('#modal').attr('action');
-
+    $('#modal').find('#status_messages').html('');
     if (text !== '') {
         $.ajax({
             type: 'POST',

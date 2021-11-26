@@ -1,20 +1,21 @@
 <?php
 
 use app\models\Comments;
+use app\models\SessionLogin;
+use app\models\TreeBuilder;
 use yii\bootstrap4\ActiveForm;
 use yii\bootstrap4\Modal;
 use yii\helpers\Html;
 use yii\widgets\Pjax;
 
-$this->title = 'Тестовое Gajin';
+$this->title = 'Тестовое';
 
 
 ?>
 
 <?php Pjax::begin(['id' => 'header_block']); ?>
 <?php
-$login_user = Yii::$app->session->get('username');
-
+$login_user = SessionLogin::getLogedUsername();
 
 ?>
     <div class="row">
@@ -39,7 +40,6 @@ $login_user = Yii::$app->session->get('username');
 
 
     <?php
-    $login_user = Yii::$app->session->get('username');
     if($login_user) { ?>
         <div class="row">
             <div class="col-md-6">
@@ -62,8 +62,10 @@ $login_user = Yii::$app->session->get('username');
             <div class="row">
                 <div class="col-md-12">
                     <?php
-                    $comments = Comments::getAll();
-                    $trees = Comments::makeTrees($comments);
+
+                    $builder = new TreeBuilder(Comments::getAll());
+                    $builder->buildTrees();
+
                     ?>
                 </div>
             </div>
@@ -78,10 +80,10 @@ Modal::begin([
     'size' => 'modal-lg',
 ]); ?>
 
-    <textarea id="comment_input" class="form-control"></textarea><br>
-    <button class="btn btn-success" id="saveComment">Отправить</button>
+<textarea id="comment_input" class="form-control"></textarea><br>
+<button class="btn btn-success" id="saveComment">Отправить</button>
 
-    <div id="status_messages"></div>
+<div id="status_messages"></div>
 
 <?php  Modal::end();
 ?>

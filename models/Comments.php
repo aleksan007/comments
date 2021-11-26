@@ -7,21 +7,17 @@ use Yii;
 
 class Comments extends \yii\db\ActiveRecord
 {
-    /**
-     * {@inheritdoc}
-     */
+
     public static function tableName()
     {
         return 'comments';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+
     public function rules()
     {
         return [
-            [['text', 'user'], 'required'],
+            [['user'], 'required'],
             [['user'], 'string', 'max' => 100],
             [['text'], 'string'],
             [['date'], 'safe'],
@@ -30,28 +26,18 @@ class Comments extends \yii\db\ActiveRecord
         ];
     }
 
+    public $login_repository;
+
+
     public function attributeLabels()
     {
         return ['text'=>'Новое сообщение'];
     }
 
     public static function getAll() {
-        $all = self::find()->all();
-        return self::groupComments($all);
+        return self::find()->all();
     }
 
-    public static function groupComments($comments) {
-        $comments_arr = [];
-        foreach ($comments as $comment) {
-            $comments_arr[$comment->id] = $comment;
-        }
-        $res = [];
-        foreach($comments_arr as $comment) {
-            if ($comment->id == $comment->parent_id) $comment->parent_id = 0;
-            $res[$comment->parent_id][] = $comment;
-        }
-        return $res;
-    }
 
     public function getDate() {
         return date('d.m.Y H:i',strtotime($this->date));
@@ -61,35 +47,26 @@ class Comments extends \yii\db\ActiveRecord
         return $this->user;
     }
 
-    public static function makeTrees($comments, $root = 0) {
-        if(!$comments) return false;
-        foreach($comments[$root] as $comment) {
-            self::writeComment($comments, $comment);
-        }
-    }
-
-    protected static function writeComment($comments, $comment) {
-        echo "<div class='comment'>";
-        echo "<text>{$comment->text}</text>";
-        echo "<author>{$comment->getAuthor()}</author> ";
-        echo "<date>{$comment->getDate()}</date> ";
-
-        if($comment->canDelete())  echo "<delete attr_id_comment={$comment->id}>Удалить</delete>";
-        if($comment->canUpdate())  echo "<change attr_id_comment={$comment->id}>Изменить</change>";
-        if($comment->canReply())  echo  "<reply attr_id_comment={$comment->id}>Ответить</reply>";
-
-        if (isset($comments[$comment->id])) {
-            self::makeTrees($comments, $comment->id);
-        }
-        echo "</div>";
-    }
-
     public function reply($text) {
+        if($this->canReply()) {
+            $new = new self();
+            $new->text = $text;
+            $new->user = SessionLogin::getLogedUsername();
+            $new->parent_id = $this->id;
+            if($new->save()) {
+                return Response::success('Комментарий добавлен');
+            }
+        }
+    }
+
+    public static function createNew($text) {
         $new = new self();
+        $new->user = SessionLogin::getLogedUsername();
         $new->text = $text;
-        $new->user = Yii::$app->session->get('username');
-        $new->parent_id = $this->id;
-       return $new->save();
+        $new->parent_id = 0;
+        if($new->save()) {
+            return Response::success('Комментарий добавлен');
+        }
     }
 
     protected function getHourDiff() {
@@ -105,20 +82,40 @@ class Comments extends \yii\db\ActiveRecord
     }
 
     public function canReply() {
-        return (Yii::$app->session->get('username')) ? true : false;
+        return (SessionLogin::getLogedUsername()) ? true : false;
     }
 
     protected function isAuthor() {
-        return Yii::$app->session->get('username') == $this->user;
+        return SessionLogin::isLogin($this->user) == $this->user;
     }
 
     public function updateChildrens() {
-        $childrens = Comments::find()->where(['parent_id'=>$this->id])->all();
+        $childrens = self::find()->where(['parent_id'=>$this->id])->all();
         foreach ($childrens as $children) {
             $children->parent_id = $this->parent_id;
             $children->save();
         }
     }
+
+    public function deleteComment() {
+        if($this->canDelete() && $this->delete()) {
+            $this->updateChildrens();
+            return Response::success('Комментарий удален');
+        }
+    }
+
+    public function edit($text) {
+        if($this->canUpdate()) {
+            $this->text = $text;
+            if($this->update()) {
+                return Response::success('Комментарий изменен');
+            }
+        }
+    }
+
+
+
+
 
 
 

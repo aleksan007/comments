@@ -13,7 +13,7 @@ class Login extends Model
     public function rules()
     {
         return [
-            [['user'], 'required'],
+            [['user','text'], 'required'],
             [['user'], 'string', 'max' => 100, 'min'=>3],
         ];
     }

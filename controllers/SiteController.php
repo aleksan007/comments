@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\Response;
+use app\models\SessionLogin;
 use Yii;
 use yii\web\Controller;
 
@@ -18,7 +19,9 @@ class SiteController extends Controller
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = Yii::$app->request->post('Login');
         $username = $post['user'];
-        Yii::$app->session->set('username',$username);
-        return Response::success(Yii::$app->session->get('username'));
+
+        $session = new SessionLogin();
+        $session->login($username);
+        return Response::success();
     }
 }
